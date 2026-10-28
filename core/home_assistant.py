@@ -1,6 +1,6 @@
 """Optional smart-home control through a local Home Assistant.
 
-BMO talks to Home Assistant's REST API on the LAN with a long-lived access
+Sn00py talks to Home Assistant's REST API on the LAN with a long-lived access
 token the user pastes into settings.json — no cloud, no account linking.  Like
 timers, this is pre-LLM routing: qwen3:1.7b would happily invent an entity id
 or "turn off" the wrong thing, so commands are parsed deterministically here
@@ -54,13 +54,13 @@ _SERVICES = {
 }
 _SAFETY_ACTIONS = ("open", "close", "lock", "unlock")
 
-MSG_UNREACHABLE = "Hmm, BMO couldn't reach Home Assistant."
-MSG_BAD_TOKEN = "Home Assistant didn't accept BMO's token."
+MSG_UNREACHABLE = "Hmm, Sn00py couldn't reach Home Assistant."
+MSG_BAD_TOKEN = "Home Assistant didn't accept Sn00py's token."
 MSG_HA_ERROR = "Hmm, Home Assistant had a problem doing that."
 
 
 class HomeAssistantError(Exception):
-    """A failure with the sentence BMO should say about it."""
+    """A failure with the sentence Sn00py should say about it."""
 
     def __init__(self, spoken: str):
         super().__init__(spoken)
@@ -69,8 +69,8 @@ class HomeAssistantError(Exception):
 
 # ---------------------------------------------------------------- parsing ---
 
-_PREFIX_RE = re.compile(r"^(?:hey bmo|hi bmo|okay bmo|ok bmo|bmo|please|can you|could you|would you)\s+")
-_SUFFIX_RE = re.compile(r"\s+(?:please|for me|bmo)$")
+_PREFIX_RE = re.compile(r"^(?:hey snoopy|hi snoopy|okay snoopy|ok snoopy|snoopy|please|can you|could you|would you)\s+")
+_SUFFIX_RE = re.compile(r"\s+(?:please|for me|snoopy)$")
 # Targets that are never a smart-home device: pronouns, and things other
 # routes own ("turn off the music" belongs to the music player).
 _NOT_TARGETS = {"it", "that", "this", "them", "these", "those", "you", "yourself", "me",
@@ -339,8 +339,8 @@ class HomeAssistant:
                 # "is the library open?" is a question for the LLM, not about the house.
                 return None
             if action in _SAFETY_ACTIONS and any(e["domain"] in _SERVICES[action] for e in entities):
-                return f"BMO isn't sure which one you mean by '{target}', so BMO won't touch it."
-            return f"BMO couldn't find anything called '{target}'."
+                return f"Sn00py isn't sure which one you mean by '{target}', so Sn00py won't touch it."
+            return f"Sn00py couldn't find anything called '{target}'."
         if len(matches) > 1:
             groupable = (tier == "contained" and _is_group_request(target)
                          and not any(_is_safety(e) for e in matches))
