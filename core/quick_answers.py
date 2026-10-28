@@ -19,7 +19,7 @@ from core.briefing.holidays import holidays
 # ---------------------------------------------------------------- normalising
 
 _LEAD_FILLER_RE = re.compile(
-    r"^(?:(?:hey|hi|hello|ok|okay|yo)\s+bmo\b|bmo\b|please\b|so\b|um+\b|uh+\b"
+    r"^(?:(?:hey|hi|hello|ok|okay|yo)\s+snoopy\b|snoopy\b|please\b|so\b|um+\b|uh+\b"
     r"|(?:can|could|would|will)\s+you\s+(?:please\s+)?(?:tell\s+me|say|work\s+out|figure\s+out)\b"
     r"|(?:can|could|would|will)\s+you\s+(?:please\s+)?(?=convert\b|calculate\b)"
     r"|do\s+you\s+know|tell\s+me\b(?!\s+about)|i\s+(?:want|need)\s+to\s+know|i\s+wonder)[\s,]*"
@@ -372,7 +372,7 @@ def _math_reply(text: str):
     try:
         value = _Parser(tokens).parse()
     except ZeroDivisionError:
-        return "Even BMO can't divide by zero!"
+        return "Even Joe Cool can't divide by zero!"
     except (_MathError, OverflowError):
         return None
     if math.isinf(value) or math.isnan(value) or abs(value) >= 1e15:
