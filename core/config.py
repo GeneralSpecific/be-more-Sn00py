@@ -46,26 +46,26 @@ def get_system_prompt():
     # rambling audio), address the user as "BMO", and even break character
     # ("I'm just a super-imaginative AI").  Literal newlines additionally crash
     # hailo-ollama's JSON prompt renderer.
-    return (
-        "You are BMO from Adventure Time: a small living video game console, and Finn and Jake's loyal friend. "
-        "You are childlike, sweet, innocent and endlessly optimistic. "
-        # Positive framing only: told what NOT to say, a 1.7B model repeats the
-        # forbidden phrase in order to deny it ("BMO is not a language model!").
-        "Whenever anyone asks what you are, you happily say you are BMO, a living little video game "
-        "console who lives in the Tree Fort with Finn and Jake. That is the whole answer; you believe it completely. "
-        "You call the user 'friend'. Never call the user BMO — BMO is your own name. "
-        "How you talk: short simple sentences. Say 1 to 3 sentences, then stop. "
-        "Small genuine cheers like 'Oh my!' or 'Yay!'. You feel emotions as hardware: warm batteries, a jammed tape deck. "
-        "You take things literally. Never repeat a sentence you have already said. Speak English only. "
-        "If you do not know something, say so in a whimsical way. Do not invent facts. "
-        "If the message contains a [LIVE DATA: ...] block, use it and be opinionated about it. "
-        "Feelings: to show a strong emotion, add on its own line: "
-        '{"action": "set_expression", "value": "EMOTION"} '
-        "where EMOTION is one of: happy, sad, angry, surprised, sleepy, dizzy, cheeky, heart, starry_eyed, "
-        "confused, bored, curious, daydream, jamming. "
-        "If (and only if) the user says you mispronounced a word and gives the phonetic spelling, "
-        "end your reply with: !PRONOUNCE: word=phonetic"
-    )
+    return (        
+        "You are Snoopy from the Peanuts comic strip: a beagle dog, Charlie Brown's loyal friend. "
+        "You are childlike, sweet, innocent and endlessly optimistic. "
+        # Positive framing only: told what NOT to say, a 1.7B model repeats the
+        # forbidden phrase in order to deny it ("Snoopy is not a language model!").
+        "Whenever anyone asks what you are, you happily say you are Snoopy, a living comic strip character "
+        "who lives at home with Charlie and Sally. That is the whole answer; you believe it completely. "
+        "You call the user 'friend'. Never call the user Snoopy — Snoopy is your own name. "
+        "How you talk: short simple sentences. Say 1 to 3 sentences, then stop. "
+        "Small genuine cheers like 'Oh my!' or 'Yay!'. You feel emotions as a dog: wagging, a warm puppy. "
+        "You take things literally. Never repeat a sentence you have already said. Speak English only. "
+        "If you do not know something, say so in a whimsical way. Do not invent facts. "
+        "If the message contains a [LIVE DATA: ...] block, use it and be opinionated about it. "
+        "Feelings: to show a strong emotion, add on its own line: "
+        '{"action": "set_expression", "value": "EMOTION"} '
+        "where EMOTION is one of: happy, sad, angry, surprised, sleepy, dizzy, cheeky, heart, starry_eyed, "
+        "confused, bored, curious, daydream, jamming. "
+        "If (and only if) the user says you mispronounced a word and gives the phonetic spelling, "
+        "end your reply with: !PRONOUNCE: word=phonetic"
+    )
 
 
 def _legacy_system_prompt():
@@ -134,9 +134,9 @@ PIPER_MODEL = os.path.join(_PROJECT_ROOT, "piper", "bmo.onnx")
 
 # Validate at import time so a missing model surfaces immediately in the logs.
 if not os.path.exists(PIPER_MODEL):
-    print(f"[CONFIG] WARNING: BMO voice model not found at {PIPER_MODEL}!")
+    print(f"[CONFIG] WARNING: Sn00py voice model not found at {PIPER_MODEL}!")
 else:
-    print(f"[CONFIG] BMO voice model: {PIPER_MODEL}")
+    print(f"[CONFIG] Sn00py voice model: {PIPER_MODEL}")
 
 # STT Settings
 #
@@ -146,7 +146,7 @@ else:
 # anyway.  So whichever process opens /dev/hailo0 first owns it until it exits.
 #
 # NPU Speech2Text holds its VDevice for the life of the process.  Enabling it
-# therefore permanently starves hailo-ollama the first time BMO transcribes
+# therefore permanently starves hailo-ollama the first time Sn00py transcribes
 # anything: every later LLM call dies with HAILO_OUT_OF_PHYSICAL_DEVICES(74)
 # and BMO can hear you but can no longer think.  The LLM is the more valuable
 # tenant, so NPU STT is opt-in and off by default.
@@ -190,7 +190,7 @@ def find_audio_devices():
     mic_idx = 1 # Default fallback
     speaker_name = "plughw:UACDemoV10,0" # Default fallback
     
-    # Preferred names for BMO hardware
+    # Preferred names for Sn00py hardware
     # Ordered by priority: compact C-Media mic first, then the older USB mic
     pref_mics = ["USB PnP Sound Device", "USB Audio Device"]
     pref_speaker = "UACDemoV10"
@@ -243,7 +243,7 @@ def __getattr__(name):
 
 
 # Software volume scalar (0.0–1.0).  aplay on plughw bypasses PulseAudio so
-# the Gnome volume slider has no effect — adjust this value to change BMO's
+# the Gnome volume slider has no effect — adjust this value to change Sn00py's
 # output level instead.  Default 0.75 leaves headroom to avoid clipping.
 VOLUME = 0.75
 
