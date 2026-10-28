@@ -100,7 +100,7 @@ def search_web(query: str) -> str:
             
             # Use Canadian region if Ontario is mentioned or if it's a general request in this fork
             # This makes BMO feel more local to the user's setup.
-            region = 'ca-en' if any(k in query_lower for k in ['ontario', 'canada', 'brantford', 'toronto']) else 'wt-wt'
+            region = 'us-en' if any(k in query_lower for k in ['wisconsin', 'united states', 'chicago']) else 'wt-wt'
             
             # 1. Try News search first for current events (skip for weather)
             if any(k in query_lower for k in ["news", "latest", "today", "happening", "current"]):
