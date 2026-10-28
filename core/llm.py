@@ -254,7 +254,7 @@ _LEAK_PATTERNS = [
 ]
 # Line-start labels we can safely strip (only when they begin a line)
 _LINE_LABEL_RE = re.compile(
-    r'^\s*(?:My thoughts|Reaction|Opinion|BMO\'s thoughts|BMO\'s reaction|'
+    r'^\s*(?:My thoughts|Reaction|Opinion|Snoopy\'s thoughts|Snoopy\'s reaction|'
     r"Summarize|Fact|RULES?|Info|Rule \d+):\s*",
     re.IGNORECASE | re.MULTILINE,
 )
@@ -295,7 +295,7 @@ def strip_prompt_leakage(content: str) -> str:
 
     Strategy:
     1. Strip <think>...</think> reasoning blocks (Qwen often emits these).
-    2. Honour [BMO]…[/BMO] markers if present — return only what's between.
+    2. Honour [Snoopy]…[/Snoopy] markers if present — return only what's between.
     3. Otherwise, just remove unambiguous template placeholders and line-start
        labels.  We deliberately do NOT truncate the reply at phrases like
        "Rule 1:" or "Summarize:" because users legitimately say those things.
@@ -312,13 +312,13 @@ def strip_prompt_leakage(content: str) -> str:
             content = re.split(r'<think>', content, flags=re.IGNORECASE)[0].strip()
 
     # 2. [BMO] markers — extract only the bracketed reply if present
-    if "[/BMO]" in content:
-        m = re.search(r'\[BMO\](.*?)\[/BMO\]', content, flags=re.DOTALL | re.IGNORECASE)
+    if "[/Snoopy]" in content:
+        m = re.search(r'\[Snoopy\](.*?)\[/Snoopy\]', content, flags=re.DOTALL | re.IGNORECASE)
         if m:
             content = m.group(1).strip()
-    elif "[BMO]" in content:
+    elif "[Snoopy]" in content:
         # Half-tagged — strip everything before [BMO]
-        content = content.split("[BMO]", 1)[1].strip()
+        content = content.split("[Snoopy]", 1)[1].strip()
 
     # 3. Line-start labels and numbered list prefixes
     content = _LINE_LABEL_RE.sub('', content)
@@ -448,7 +448,7 @@ sanitize_messages = _sanitize_messages
 
 
 def _quick_lead_in(user_text: str, intent: str) -> str:
-    """Return a one-line BMO acknowledgement before a pre-routed action runs.
+    """Return a one-line Snoopy acknowledgement before a pre-routed action runs.
 
     Tries FAST_LLM_MODEL with a *tight* 600 ms ceiling — beyond that the user
     perceives lag and the static fallback is the better experience.  On Pi 5 +
@@ -457,22 +457,22 @@ def _quick_lead_in(user_text: str, intent: str) -> str:
     import random as _random
     fallbacks = {
         "image": [
-            "Ooh, let BMO draw something for you!",
-            "Time for some BMO art!",
-            "BMO has a picture in mind!",
-            "Let BMO show you something neat!",
+            "Ooh, let me draw something for you!",
+            "Time for some Peanuts art!",
+            "I have a picture in mind!",
+            "Let Joe Cool show you something neat!",
         ],
         "photo": [
-            "BMO is taking a look!",
-            "Hold still, BMO is looking!",
-            "Let BMO see what you've got!",
-            "Ooh, BMO loves looking at things!",
+            "Detective Snoopy will take a look!",
+            "Hold still, I'm looking!",
+            "Let me see what you've got!",
+            "Ooh, I love looking at things!",
         ],
         "music": [
             "Time to jam!",
-            "Music time! BMO is so excited!",
-            "Let BMO play you a tune!",
-            "Oh yeah, BMO loves this song!",
+            "Music time! Let's Boogie!",
+            "Let BMmeO play you a tune!",
+            "Oh yeah, I love this song!",
         ],
     }
     try:
@@ -480,7 +480,7 @@ def _quick_lead_in(user_text: str, intent: str) -> str:
             "model": FAST_LLM_MODEL,
             "messages": _sanitize_messages([
                 {"role": "system", "content":
-                 "You are BMO. Reply with ONE short, cheerful sentence (max 12 words) "
+                 "You are Snoopy. Reply with ONE short, cheerful sentence (max 12 words) "
                  "acknowledging what the user asked for. No markdown, no quotes."},
                 {"role": "user", "content": user_text},
             ]),
@@ -666,7 +666,7 @@ class Brain:
         """'{"action": "play_briefing"}' if this asks for the briefing, else None.
 
         "Good morning" only plays a briefing that's ready and unplayed (else
-        BMO chats as usual); "morning briefing" and friends play any time.
+        Snoopy chats as usual); "morning briefing" and friends play any time.
         No lead-in: the briefing opens with its own greeting."""
         if self.briefing_ready is None:
             return None
@@ -679,7 +679,7 @@ class Brain:
 
     @staticmethod
     def _game_action(user_text: str):
-        """(lead-in, action) for "let's play a game" / "play BMO says", else None."""
+        """(lead-in, action) for "let's play a game" / "play Snoopy says", else None."""
         key = game_voice.match(user_text)
         if key is None:
             return None
@@ -729,14 +729,14 @@ class Brain:
                     self.reminders.remove(r["id"])
                 return "Okay! Everything's cancelled." if hits else "There's nothing to cancel, friend."
             if not hits:
-                return "Hmm, BMO couldn't find that one." if items else "There's nothing to cancel, friend."
+                return "Hmm, I couldn't find that one." if items else "There's nothing to cancel, my gal."
             if len(hits) > 1:
                 return "Which one? You have " + _or_list([_label(r) for r in hits]) + "."
             self.reminders.remove(hits[0]["id"])
             return f"Okay, I cancelled {_label(hits[0])}."
         # time left
         if not hits:
-            return "Hmm, BMO couldn't find that one." if items else "You don't have any timers running."
+            return "Hmm, I couldn't find that one." if items else "You don't have any timers running."
         if len(hits) > 1 and q["target"] is None:
             timers = [r for r in hits if r.get("kind", "timer") == "timer"]
             hits = timers if len(timers) == 1 else hits
@@ -881,7 +881,7 @@ class Brain:
                     # Inject as a tight [LIVE DATA] block — clearer than the previous format
                     self.history[-1]["content"] = (
                         f"[LIVE DATA: {clean_result}] "
-                        f"Using only the above live data, answer in one or two sentences as BMO: {user_text}"
+                        f"Using only the above live data, answer in one or two sentences as Snoopy: {user_text}"
                     )
                     search_injected = True
             except Exception as e:
@@ -944,7 +944,7 @@ class Brain:
                             
                             # Feed the result back to the LLM to summarize
                             summary_prompt = [
-                                {"role": "system", "content": "Summarize this search result in one short, conversational sentence as BMO. Do not use markdown."},
+                                {"role": "system", "content": "Summarize this search result in one short, conversational sentence as Snoopy. Do not use markdown."},
                                 {"role": "user", "content": f"RESULT: {search_result} User Question: {user_text}"}
                             ]
 
@@ -977,11 +977,11 @@ class Brain:
                 content = strip_prompt_leakage(content)
 
                 # Ensure BMO is spelled correctly in text responses
-                content = re.sub(r'\bBeemo\b', 'BMO', content, flags=re.IGNORECASE)
+                content = re.sub(r'\bSnoopy\b', 'Sn00py', content, flags=re.IGNORECASE)
 
                 # Fallback if filtering left nothing useful
                 if not content.strip():
-                    content = "BMO is here! How can I help?"
+                    content = "Snoopy here! How can I help?"
 
                 self.history.append({"role": "assistant", "content": content})
                 assistant_appended = True
@@ -1131,8 +1131,8 @@ class Brain:
         # false triggers on casual phrases like 'how are you doing today'.
         realtime_keywords = [
             "weather", "forecast", "temperature", "tonight", "tomorrow",
-            "news", "latest", "right now", "score", "stocks", "bitcoin",
-            "crypto", "price of", "happening", "recently", "live",
+            "news", "latest", "right now", "score",
+            "price of", "happening", "recently", "live",
         ]
         question_markers = [
             "what", "who", "when", "where", "find", "search", "tell me",
@@ -1251,7 +1251,7 @@ class Brain:
                                     # Strip system prompt leakage
                                     cleaned = strip_prompt_leakage(buffer)
                                     # Ensure BMO spelling before yielding
-                                    out_chunk = re.sub(r'\bBeemo\b', 'BMO', cleaned, flags=re.IGNORECASE)
+                                    out_chunk = re.sub(r'\bSnoopy\b', 'Sn00py', cleaned, flags=re.IGNORECASE)
                                     if out_chunk.strip():
                                         yield out_chunk
                                     buffer = ""
@@ -1263,7 +1263,7 @@ class Brain:
                     buffer += thinker.flush()
                     if buffer.strip():
                         cleaned = strip_prompt_leakage(buffer)
-                        out_chunk = re.sub(r'\bBeemo\b', 'BMO', cleaned, flags=re.IGNORECASE)
+                        out_chunk = re.sub(r'\bSnoopy\b', 'Sn00py', cleaned, flags=re.IGNORECASE)
                         if out_chunk.strip():
                             yield out_chunk
 
@@ -1351,7 +1351,7 @@ class Brain:
             # Build the structured prompt expected by the Qwen2-VL model
             prompt = [
                 {"role": "system", "content": [
-                    {"type": "text", "text": "You are BMO, a helpful robot assistant. Describe what you see concisely and conversationally in English."}
+                    {"type": "text", "text": "You are Snoopy, Charlie Brown's helpful pet dog assistant. Describe what you see concisely and conversationally in English."}
                 ]},
                 {"role": "user", "content": [
                     {"type": "image"},
@@ -1404,7 +1404,7 @@ class Brain:
 
         except FileNotFoundError as e:
             logger.warning(f"VLM HEF not found: {e}")
-            return "BMO's vision model isn't installed yet. Run setup.sh to download it!"
+            return "Sn00py's vision model isn't installed yet. Run setup.sh to download it!"
         except Exception as e:
             logger.error(f"VLM Exception: {e}", exc_info=True)
             return "I tried to look, but my eyes aren't working right now."
@@ -1413,7 +1413,7 @@ class Brain:
             # thread is still touching the device — releasing under it segfaults.
             if _vlm_inflight():
                 logger.error("VLM inference still running; leaving /dev/hailo0 held. "
-                             "Restart BMO to recover the NPU for the LLM.")
+                             "Restart Sn00py to recover the NPU for the LLM.")
             else:
                 _release_vlm()
                 if freed:
