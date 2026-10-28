@@ -1,13 +1,13 @@
-﻿# Be More Agent — Hailo-10H Edition
+﻿# Be More Sn00py Agent 
 
 <p align="center">
-  <img src="bmo_irl.jpg" height="300" alt="BMO On-Device" />
-  <img src="bmo-web.png" height="300" alt="BMO Web Interface" />
+  <img src="bmo_irl.jpg" height="300" alt="Sn00py On-Device" />
+  <img src="bmo-web.png" height="300" alt="Sn00py Web Interface" />
 </p>
 
-A fork of [@brenpoly's be-more-agent](https://github.com/brenpoly/be-more-agent) project, built to run fully on-device on a **Raspberry Pi 5** with the **Raspberry Pi AI HAT 2+** (Hailo-10H). BMO listens for its wake word, understands what you say, thinks about it locally, and talks back — no cloud, no subscriptions, no data leaving your house.
+A fork of a fork [@brenpoly's be-more-agent](https://github.com/brenpoly/be-more-agent) project, built to run fully on-device on a **Raspberry Pi 5** with the **Raspberry Pi AI HAT 2+** (Hailo-10H). Sn00py listens for his wake word, understands what you say, thinks about it locally, and talks back — no cloud, no subscriptions, no data leaving your house.
 
-This fork adds a browser-based **web interface**, a shared `core/` module layer used by both interfaces, and updated support for the Hailo NPU hardware.
+This fork removes the LCD stuff but adds animatronic motion via hobby servo motors, status indication with a NeoPixel, and vision recognition with a raspberry Pi camera.
 
 ---
 
@@ -19,7 +19,7 @@ This fork adds a browser-based **web interface**, a shared `core/` module layer 
 | Vision (`Qwen3-VL-2B-Instruct`) | Hailo-10H NPU | via HailoRT Python API; optional, requires camera; borrows the NPU per photo |
 | STT (`whisper.cpp`, `ggml-base.en`) | CPU | ~2.7 s per utterance; NPU Whisper is opt-in, see below |
 | TTS (Piper) | CPU | streams sentence-by-sentence while LLM generates |
-| Wake word (openWakeWord) | CPU | "Hey BMO" custom model |
+| Wake word (openWakeWord) | CPU | "Hey Snoopy" custom model |
 
 ### The NPU is single-tenant
 
@@ -48,12 +48,15 @@ So the NPU budget is: **the LLM gets it.** Consequences:
 ## Interfaces
 
 ### On-Device (`agent_hailo.py`)
-BMO in its natural habitat. Plug in a screen, a USB mic, and a USB speaker and you get the full experience: animated faces, wake word detection, and the whole listen → think → speak loop running locally. After a response, tap the screen (or the tap button) to speak again without repeating the wake word — the screen shows "Tap to speak" when BMO is ready.
+Modifications planned - add servo control to replace the LCD display.
+Sn00py in his natural habitat. Plug in a screen, a USB mic, and a USB speaker and you get the full experience: animated faces, wake word detection, and the whole listen → think → speak loop running locally. After a response, tap the screen (or the tap button) to speak again without repeating the wake word — the screen shows "Tap to speak" when Sn00py is ready.
 
 ### Web (`web_app.py`)
-A FastAPI server with a browser-based UI — useful if you want to talk to BMO from another room, or you'd rather not have a screen hanging off your Pi. Hold a button to record, and BMO responds with audio in your browser.
+Modification planned: change this to adapt to Sn00py's needs.
+A FastAPI server with a browser-based UI — useful if you want to talk to Sn00py from another room, or you'd rather not have a screen hanging off your Pi. Hold a button to record, and Sn00py responds with audio in your browser.
 
 The web interface includes:
+- **Planned features**
 - **Debug panel** — conversation history and live server logs
 - **Pronunciation override** — corrects how Piper pronounces specific words
 - **LLM status indicator** — shows whether the NPU model is ready
@@ -63,7 +66,7 @@ The web interface includes:
 ---
 
 ## Interactive Features
-
+- ** Planned modifications to this will personalize the BMO behaviors to modify towards Sn00py**
 BMO includes several dynamic, interactive capabilities beyond basic conversation:
 
 - **Instant answers:** time, date, *"how many days until Christmas?"*, maths (*"what's 15% of 80?"*) and unit conversions (*"how many ml in a cup?"*) are answered straight away, without the LLM, so they're instant and always right.
